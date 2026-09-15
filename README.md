@@ -7,6 +7,8 @@ Your saved prompts, right above the chat input.
 Promptaro is a small macOS menu bar app. It shows a row of editable prompt buttons
 above the focused chat composer. Click a button to insert its full text and send.
 
+![Promptaro buttons above a chat input](assets/promptaro-chat.png)
+
 ## Install
 
 Requires macOS 14 or later. The release app includes Apple Silicon and Intel builds
