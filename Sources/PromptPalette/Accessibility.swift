@@ -156,7 +156,6 @@ final class FocusTracker {
         guard AXIsProcessTrusted(),
               let app = NSWorkspace.shared.frontmostApplication,
               let bundle = app.bundleIdentifier,
-              !ComposerPolicy.excludedBundleIDs.contains(bundle),
               app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return nil }
         let nativeChat = ComposerPolicy.bundleIDs.contains(bundle)
         let openCode = bundle == "ai.opencode.desktop"

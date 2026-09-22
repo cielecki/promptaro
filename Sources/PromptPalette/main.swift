@@ -75,7 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             self.palette.rebuild(config)
         }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "text.bubble.fill", accessibilityDescription: AppIdentity.name)
+        statusItem.button?.image = PromptaroIcon.menuBarImage()
         statusItem.button?.toolTip = AppIdentity.name
         statusItem.button?.setAccessibilityLabel(AppIdentity.name)
         rebuildMenu()

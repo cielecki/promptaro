@@ -69,19 +69,24 @@ public final class ConfigurationStore {
 }
 
 public enum ComposerPolicy {
-    public static let excludedBundleIDs: Set<String> = ["com.tinyspeck.slackmacgap"]
-
     public static let bundleIDs: Set<String> = [
         "com.anthropic.claudefordesktop", "com.openai.chat", "com.openai.codex",
         "ai.opencode.desktop"
+    ]
+
+    // A multiline editor is not evidence of an AI chat. Match exact service hosts
+    // before applying the generic editor heuristics, regardless of the browser.
+    public static let webChatHosts: Set<String> = [
+        "chatgpt.com", "chat.openai.com", "claude.ai", "gemini.google.com",
+        "copilot.microsoft.com", "perplexity.ai", "www.perplexity.ai",
+        "grok.com", "chat.mistral.ai", "chat.deepseek.com"
     ]
 
     public static func acceptsWebURL(_ url: URL) -> Bool {
         guard let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme),
               let host = url.host?.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".")),
               !host.isEmpty else { return false }
-        // Slack's ordinary messaging inputs are outside the AI prompt palette's scope.
-        return host != "slack.com" && !host.hasSuffix(".slack.com")
+        return webChatHosts.contains(host)
     }
 
     public static func accepts(role: String, subrole: String, hints: String, editable: Bool?) -> Bool {

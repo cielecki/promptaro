@@ -58,20 +58,22 @@ are using, under that service's own privacy terms.
 
 Detection is implemented for ChatGPT, Codex, Claude Desktop (including its Code
 view), and OpenCode Desktop. Browser detection uses macOS Accessibility without
-an extension or a website allowlist. Safari, Chrome, and other browsers need to
-expose an editable composer and page URL.
+an extension. Safari, Chrome, and other browsers need to expose an editable
+composer and page URL. The page must use a recognized AI chat host: ChatGPT,
+Claude, Gemini, Copilot, Perplexity, Grok, Mistral Chat or DeepSeek Chat.
 
 Early testing includes user-confirmed multiline sending in ChatGPT on desktop
 and in Chrome, plus appearance and placement in Safari and Claude Code desktop.
 This is not a guarantee for every app version. Safari sending, OpenCode Desktop,
 other browsers, installation by a new user, and Intel runtime still need wider testing.
 
-Browser detection can also show buttons in other multiline web forms. Custom
-editors may expose too little information for insertion verification or accurate
+Custom editors may expose too little information for insertion verification or accurate
 placement. Search and password fields are excluded. Terminal windows and CLI
 chat apps are unsupported.
 
-Slack's desktop app and Slack web pages are excluded.
+Unknown websites, including Slack, Discord and Todoist, do not qualify.
+Recognizing a site does not establish that sending and positioning work there;
+services beyond the early testing above still need live testing.
 
 ## Build
 
