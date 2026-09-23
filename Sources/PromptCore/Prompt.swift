@@ -16,8 +16,8 @@ public struct Prompt: Codable, Equatable, Identifiable {
     }
 
     public static let defaults = [
-        Prompt(title: "Next step?", text: "Note the possible paths forward and try to organize work in a way where you acquire sufficient information/decisions from me in order to work autonomously for an extended period of time.\n\nIn a final message only recommend the next logical step in this chat. "),
-        Prompt(title: "Proceed", text: "Proceed - this may be my approval, marking that I have done what you asked me for or an expectation you to do it for me; if you have any loose ends, tidy them up; in any case proceed with next logical step in this situation."),
+        Prompt(title: "Next step?", text: "Next step? (Think through the possible paths forward. Plan so your next step can, where it makes sense, cover a long stretch of work on your own. In your final message, recommend that next step and ask every decision you need from me for it, each with your recommended answer.)"),
+        Prompt(title: "Proceed", text: "Proceed (if you have any loose ends, tidy them up; If you proposed the next step, it's approved as proposed; If you asked me to do something, check whether it's done and finish it yourself if not; If you haven't proposed the next step, propose one now)"),
         Prompt(title: "Step back", text: "Take a step back and look at the entire backlog, all the things we have open in this chat and lets do backlog grooming, prioritisation and operationalization of work."),
         Prompt(title: "Explain", text: "Explain in simple terms what you mean, because I don't understand. Most likely some of the things you mentioned need expanding upon."),
         Prompt(title: "TLDR", text: "TLDR"),
