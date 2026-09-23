@@ -34,12 +34,15 @@ final class PaletteController {
     var onEdit: (() -> Void)?
     var onDismiss: (() -> Void)?
     private let statusLabel = NSTextField(labelWithString: "")
-    private let scroll = NSScrollView()
+    private let strip = NSView()
+    private let more = NSPopUpButton(frame: .zero, pullsDown: true)
     private let edit = NSButton()
     private let close = NSButton()
     private var rows: [PromptButton] = []
     private var preferredWidth: CGFloat = 360
     private var message: String?
+    private var overflowIndices: [Int] = []
+    private var busy = false
 
     init() {
         panel = FloatingPanel(contentRect: NSRect(x: 0, y: 0, width: 360, height: 44),
@@ -62,10 +65,12 @@ final class PaletteController {
         effect.layer?.cornerRadius = 10
         effect.layer?.masksToBounds = true
         panel.contentView = effect
-        scroll.drawsBackground = false
-        scroll.hasHorizontalScroller = false
-        scroll.horizontalScrollElasticity = .allowed
-        effect.addSubview(scroll)
+        effect.addSubview(strip)
+        more.bezelStyle = .rounded
+        more.font = .systemFont(ofSize: 12, weight: .medium)
+        more.setAccessibilityLabel("More prompts")
+        more.toolTip = "More prompts"
+        effect.addSubview(more)
         for (button, symbol, label, action) in [
             (edit, "pencil", "Edit prompts", #selector(editPrompts)),
             (close, "xmark", "Dismiss prompts", #selector(dismiss))
@@ -87,7 +92,9 @@ final class PaletteController {
     }
 
     func rebuild(_ config: Configuration) {
-        let strip = NSView()
+        strip.subviews.forEach { $0.removeFromSuperview() }
+        overflowIndices = []
+        more.menu = nil
         var x: CGFloat = 0
         rows = config.prompts.map { prompt in
             let button = PromptButton(prompt: prompt)
@@ -105,18 +112,43 @@ final class PaletteController {
             strip.addSubview(empty)
             x = 128
         }
-        strip.frame = NSRect(x: 0, y: 0, width: max(0, x - 6), height: 28)
-        scroll.documentView = strip
-        preferredWidth = strip.frame.width + 82
+        preferredWidth = max(0, x - 6) + 82
         message = nil
         layout(width: min(preferredWidth, 680))
     }
 
-    private func layout(width: CGFloat) {
+    func layout(width: CGFloat) {
         let footer: CGFloat = message == nil ? 0 : 20
         let size = NSSize(width: width, height: 44 + footer)
         if panel.frame.size != size { panel.setContentSize(size) }
-        scroll.frame = NSRect(x: 8, y: 8 + footer, width: max(20, width - 82), height: 28)
+        let stripWidth = max(0, width - 82)
+        let overflow = preferredWidth > width && !rows.isEmpty
+        let buttonSpace = overflow ? max(0, stripWidth - 60) : stripWidth
+        strip.frame = NSRect(x: 8, y: 8 + footer, width: buttonSpace, height: 28)
+        var hidden: [Int] = []
+        for (index, button) in rows.enumerated() {
+            button.isHidden = button.frame.maxX > buttonSpace
+            if button.isHidden { hidden.append(index) }
+        }
+        more.isHidden = !overflow
+        more.isEnabled = !busy
+        let end = rows.last(where: { !$0.isHidden }).map { $0.frame.maxX + 6 } ?? 0
+        more.frame = NSRect(x: 8 + end, y: 8 + footer, width: 54, height: 28)
+        if hidden != overflowIndices {
+            overflowIndices = hidden
+            let menu = NSMenu()
+            menu.autoenablesItems = false
+            menu.addItem(withTitle: "More", action: nil, keyEquivalent: "")
+            for index in hidden {
+                let item = NSMenuItem(title: rows[index].title, action: #selector(sendOverflowPrompt(_:)), keyEquivalent: "")
+                item.target = self
+                item.tag = index
+                item.toolTip = rows[index].toolTip
+                item.isEnabled = !busy
+                menu.addItem(item)
+            }
+            more.menu = menu
+        }
         edit.frame = NSRect(x: width - 66, y: 10 + footer, width: 24, height: 24)
         close.frame = NSRect(x: width - 34, y: 10 + footer, width: 24, height: 24)
         statusLabel.isHidden = message == nil
@@ -135,7 +167,7 @@ final class PaletteController {
         } ?? NSScreen.main
         guard let screen else { return }
         let available = screen.visibleFrame.insetBy(dx: 8, dy: 8)
-        layout(width: min(preferredWidth, max(180, input.width), available.width, 680))
+        layout(width: min(preferredWidth, max(180, input.width), available.width))
         let size = panel.frame.size
         // The anchor includes attachments and composer controls, not just the text.
         var y = input.maxY + 10
@@ -149,10 +181,16 @@ final class PaletteController {
     func status(_ message: String?, busy: Bool) {
         // Normal operation stays a single slim row. Errors remain visible below it.
         self.message = busy || message?.hasPrefix("Preview") == true ? nil : message
+        self.busy = busy
         layout(width: panel.frame.width)
         rows.forEach { $0.isEnabled = !busy }
+        more.menu?.items.dropFirst().forEach { $0.isEnabled = !busy }
     }
     func hide() { panel.orderOut(nil) }
     @objc private func editPrompts() { onEdit?() }
     @objc private func dismiss() { hide(); onDismiss?() }
+    @objc private func sendOverflowPrompt(_ item: NSMenuItem) {
+        guard !busy, rows.indices.contains(item.tag) else { return }
+        rows[item.tag].invoke?()
+    }
 }

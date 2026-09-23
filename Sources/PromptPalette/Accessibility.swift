@@ -161,14 +161,19 @@ final class FocusTracker {
         let openCode = bundle == "ai.opencode.desktop"
         let application = AXUIElementCreateApplication(app.processIdentifier)
         AXUIElementSetMessagingTimeout(application, 0.15)
+        var focusedElement = AX.element(application, kAXFocusedUIElementAttribute)
         if nativeChat {
-            accessibilityActivation.enable(pid: app.processIdentifier) { attribute in
+            accessibilityActivation.enable(pid: app.processIdentifier,
+                                          hasFocusedElement: focusedElement != nil, manualState: {
+                AX.value(application, "AXManualAccessibility") as? Bool
+            }) { attribute in
                 let result = AXUIElementSetAttributeValue(application, attribute as CFString, kCFBooleanTrue)
                 logger.notice("Accessibility activation: \(bundle, privacy: .public) \(attribute, privacy: .public) result: \(result.rawValue)")
                 return result
             }
+            if focusedElement == nil { focusedElement = AX.element(application, kAXFocusedUIElementAttribute) }
         }
-        guard var focused = AX.element(application, kAXFocusedUIElementAttribute) else {
+        guard var focused = focusedElement else {
             recordDecision("no focused element", bundle: bundle)
             return nil
         }

@@ -14,7 +14,7 @@ above the focused chat composer. Click a button to insert its full text and send
 Requires macOS 14 or later. The release app includes Apple Silicon and Intel builds
 and is signed and notarized. Intel runtime testing is still pending.
 
-1. Download `Promptaro-1.0.0-macOS.zip` from this repository's Releases page.
+1. Download `Promptaro-1.0.1-macOS.zip` from this repository's Releases page.
 2. Unzip it and move **Promptaro.app** to **Applications**.
 3. Open Promptaro and enable it in **System Settings → Privacy & Security → Accessibility**.
 4. Focus a chat input. Your prompt buttons appear above it.
@@ -29,6 +29,10 @@ Click the pencil on the palette or **Edit Prompts…** in the menu bar menu. Eac
 prompt has a short button label and full text, including multiple paragraphs.
 Drag rows or use the up/down buttons to reorder them. Click **Save prompts** to
 apply changes. **Preview buttons** lets you try the layout without sending.
+
+On narrow inputs, **More** lists prompts that do not fit as whole buttons. Wider
+inputs show more buttons in the same row. The menu bar uses the app icon's symbol:
+three prompt buttons above a chat bubble.
 
 The seven defaults are Next step?, Proceed, Step back, Explain, TLDR, Reorient,
 and Wrap up. All are editable. Defaults apply only when no saved configuration
